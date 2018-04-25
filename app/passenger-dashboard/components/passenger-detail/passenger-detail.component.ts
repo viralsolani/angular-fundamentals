@@ -1,71 +1,99 @@
-import { Component, OnChanges, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 import { Passenger } from '../../models/passenger.interface';
+import { Baggage } from '../../models/baggage.interface';
 
 @Component({
-  selector: 'passenger-detail',
-  styleUrls: ['passenger-detail.component.scss'],
+  selector: 'passenger-form',
+  styleUrls: ['passenger-form.component.scss'],
   template: `
-    <div>
-      <span class="status" [class.checked-in]="detail.checkedIn"></span>
-      <div *ngIf="editing">
-        <input 
-          type="text" 
-          [value]="detail.fullname"
-          (input)="onNameChange(name.value)"
-          #name>
+    <form #form="ngForm" novalidate>
+      {{ detail | json }}
+
+      <div>
+        Passenger name:
+        <input
+          type="text"
+          name="fullname"
+          [ngModel]="detail?.fullname">
       </div>
-      <div *ngIf="!editing">
-        {{ detail.fullname }}
+
+      <div>
+        Passenger ID:
+        <input
+          type="number"
+          name="id"
+          [ngModel]="detail?.id">
       </div>
-      <div class="date">
-        Check in date: 
-        {{ detail.checkInDate ? (detail.checkInDate | date: 'yMMMMd' | uppercase) : 'Not checked in' }}
+
+      <div>
+        <label>
+          <input
+            type="checkbox"
+            name="checkedIn"
+            [ngModel]="detail?.checkedIn"
+            (ngModelChange)="toggleCheckIn($event)">
+        </label>
       </div>
-      <div class="children">
-        Children: {{ detail.children?.length || 0 }}
+
+      <div *ngIf="form.value.checkedIn">
+        Check in date:
+        <input
+          type="number"
+          name="checkInDate"
+          [ngModel]="detail?.checkInDate">
       </div>
-      <button (click)="toggleEdit()">
-        {{ editing ? 'Done' : 'Edit' }}
-      </button>
-      <button (click)="onRemove()">
-        Remove
-      </button>
-    </div>
+
+      <div>
+        Luggage:
+        <select
+          name="baggage"
+          [ngModel]="detail?.baggage">
+          <option
+            *ngFor="let item of baggage"
+            [value]="item.key"
+            [selected]="item.key === detail?.baggage">
+            {{ item.value }}
+          </option>
+        </select>
+        <select
+          name="baggage"
+          [ngModel]="detail?.baggage">
+          <option
+            *ngFor="let item of baggage"
+            [ngValue]="item.key">
+            {{ item.value }}
+          </option>
+        </select>
+      </div>
+
+      {{ form.value | json }}
+    </form>
   `
 })
-export class PassengerDetailComponent implements OnChanges {
+export class PassengerFormComponent {
 
   @Input()
   detail: Passenger;
 
-  @Output()
-  edit: EventEmitter<Passenger> = new EventEmitter<Passenger>();
+  baggage: Baggage[] = [{
+    key: 'none',
+    value: 'No baggage'
+  },{
+    key: 'hand-only',
+    value: 'Hand baggage'
+  },{
+    key: 'hold-only',
+    value: 'Hold baggage'
+  },{
+    key: 'hand-hold',
+    value: 'Hand and hold baggage'
+  }];
 
-  @Output()
-  remove: EventEmitter<Passenger> = new EventEmitter<Passenger>();
-
-  editing: boolean = false;
-  
-  constructor() {}
-
-  ngOnChanges(changes) {
-    if (changes.detail) {
-      this.detail = Object.assign({}, changes.detail.currentValue);
+  toggleCheckIn(checkedIn: boolean) {
+    if (checkedIn) {
+      this.detail.checkInDate = Date.now();
     }
   }
-  
-  onNameChange(value: string) {
-    this.detail.fullname = value;
-  }
-  
-  toggleEdit() {
-    if (this.editing) {
-      this.edit.emit(this.detail);
-    }
-    this.editing = !this.editing;
-  }
-  onRemove() {
-    this.remove.emit(this.detail);
-  }
+
 }
