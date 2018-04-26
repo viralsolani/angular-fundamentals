@@ -19,7 +19,8 @@ import { Passenger } from '../../models/passenger.interface';
         *ngFor="let passenger of passengers;"
         [detail]="passenger"
         (edit)="handleEdit($event)"
-        (remove)="handleRemove($event)">
+        (remove)="handleRemove($event)"
+        (view)="handleViewPassenter($event)">
       </passenger-detail>
     </div>
   `
@@ -52,5 +53,9 @@ export class PassengerDashboardComponent implements OnInit {
           return passenger.id !== event.id;
         });
       });
+  }
+
+  handleViewPassenter(event: Passenger) {
+    console.log(event);
   }
 }
