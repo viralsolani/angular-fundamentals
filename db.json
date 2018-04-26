@@ -1,11 +1,11 @@
 {
   "passengers": [
     {
-      "id": 1,
       "fullname": "Viral Solani123",
+      "id": 1,
       "checkedIn": true,
-      "checkInDate": 1490742000000,
-      "children": null
+      "baggage": "hand-only",
+      "checkInDate": 1524720621471
     },
     {
       "id": 2,
